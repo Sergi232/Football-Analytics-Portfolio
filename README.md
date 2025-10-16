@@ -25,7 +25,7 @@ Python (pandas, NumPy, scikit-learn, matplotlib), Google Colab, Power BI.
 All datasets are anonymized and/or synthetic replicas based on the structure of the working FIS and flexibility files.  
 The public version reflects **structure and methodology**, not the proprietary calculations.
 
-## 📊 Model Validation – Norwegian 2025 Sample
+## Model Validation – Norwegian 2025 Sample
 
 A validation sample of 13 Norwegian regional league matches (Sep–Oct 2025) was used to benchmark the Filial Index Score (FIS) model against real betting outcomes.
 
@@ -40,7 +40,7 @@ A validation sample of 13 Norwegian regional league matches (Sep–Oct 2025) was
 
 ---
 
-### 🔍 Interpretation and Ongoing Validation
+### Interpretation and Ongoing Validation
 
 A **+32% yield** over 13 matches indicates that the model consistently captures **market inefficiencies** driven by player flexibility and lineup asymmetries between first and reserve teams.  
 Even within a small sample size, this performance suggests **structural predictive power** rather than short-term randomness.
