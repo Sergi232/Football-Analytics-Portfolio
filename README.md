@@ -18,6 +18,17 @@ Weekly ingestion from an operator-facing **FIS (Flexibility Index System)** shee
 `Kickoff_1r`, `Kickoff_filial`, `Δt_h`, `Dir`, `F_idx`, `g (ventana)`,  
 `FIS`, `Semáforo`, `Ángulo`, `Notas`.
 
+## ⏱️ Real-time Squad Intelligence
+
+The pipeline ingests **call-ups (convocatorias)** and **official line-ups** as soon as they are published. These events trigger an incremental refresh that:
+
+- Updates **bridge-player availability** (first-team ↔ reserve) in near-real time
+- Recomputes **Δt_h sensitivity** and **F_idx** with confirmed personnel
+- Adjusts **FIS gating** (Semáforo/Ángulo) based on last-minute squad news
+- Logs **odds drift vs. model view** from open → pre-KO → post line-ups
+
+This mechanism steadily **improves calibration and precision** as match information crystallizes closer to kick-off.
+
 ### 🔹 Club-level aggregation  
 `Club_1r_equipo`, `FLEX_sum`, `FLEX_mean`, `n_players`, `n_bridge_players`.
 
