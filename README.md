@@ -1,6 +1,6 @@
-# 🇳🇴 Norwegian Regional Leagues – Dynamic Player Flow Analysis
+#Regional Leagues – Dynamic Player Flow Analysis
 
-This project analyzes **player flexibility** across Norway’s regional football leagues and its relationship with match outcomes and betting dynamics.
+This project analyzes **player flexibility** across regional football leagues and its relationship with match outcomes and betting dynamics.
 
 ## 🎯 Objective
 To quantify the influence of players moving between **first teams** and **reserve squads**, identifying tactical patterns, flexibility effects, and potential betting inefficiencies.
