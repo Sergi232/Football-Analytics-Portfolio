@@ -1,70 +1,98 @@
-# 📘 Data Structure (Aligned with FIS and Club Flex Summary)
+# 📘 Data Structure (Aligned with FIS, Player, and Club Flex Summary)
 
-This document describes the core dataset structures used in the **Norwegian Player Flow Analysis**.  
-It aligns with the working architecture of the **FIS (Flexibility Index System)** and **Club Flex Summary** tables, keeping proprietary components abstracted but maintaining structural transparency.
+This document provides a transparent schema of the datasets powering the **Norwegian Player Flow Analysis**.  
+It covers the **FIS (Flexibility Index System)**, **Club Flex Summary**, and **Player Block data**, keeping proprietary calculations abstracted but preserving structure and analytical intent.
 
 ---
 
-## 🧾 FIS Weekly Sheet (Public Schema)
+## 🧾 FIS Weekly Sheet (Core Match-Level Data)
 
 | Variable | Description |
 |-----------|-------------|
-| **Fecha** | Match date (YYYY-MM-DD). Used as primary time reference. |
-| **Liga** | Competition name or division (e.g., Division 2 – Group 1). |
-| **Partido** | Fixture label – concatenation of home and away teams. |
-| **Equipo_filial** | Reserve or “B” team involved in the match. |
+| **Fecha** | Match date (YYYY-MM-DD). Used as the temporal key. |
+| **Liga** | Competition name or division (e.g. “Norwegian Div. 2 – Avd. 3”). |
+| **Partido** | Fixture label: concatenation of home and away clubs. |
+| **Equipo_filial** | Reserve or “B” team in the fixture. |
 | **Equipo_rival** | Opponent team name. |
-| **Club_1r_equipo** | Related first-team entity linked to the reserve. |
-| **S1_Stake_1r (0–3)** | Discretionary stake score for first-team influence (0–3 scale). |
-| **S2_Stake_filial (0–3)** | Discretionary stake score for reserve side (0–3 scale). |
-| **Alt_flex** | Alternative flexibility signal derived from lineup differentials. |
-| **Mitja_flex** | Averaged flexibility signal (multi-match smoothing). |
-| **Kickoff_1r** | Scheduled kickoff time of the first-team fixture. |
-| **Kickoff_filial** | Scheduled kickoff time of the reserve fixture. |
-| **Δt_h** | Time delta (in hours) between first-team and reserve kickoffs. |
-| **Dir** | Encoded direction of player flow (`1st→B` or `B→1st`). |
-| **F_idx** | Proprietary flexibility index (scaled 0–1). |
-| **g (ventana)** | Rolling window parameter controlling aggregation scope. |
-| **FIS** | Consolidated flexibility signal (composite score). |
-| **Semáforo** | Operational traffic-light system for model gating (`red / amber / green`). |
-| **Ángulo** | Category tag for specific model setups (“angles”). |
-| **Notas** | Operator comments or qualitative notes for context. |
-| **Unnamed: 20–21** | Empty placeholder columns in the working Excel — ignored in the public schema. |
+| **Clasificación_mejor_equipo** | Relative league position of the stronger side in the pair. |
+| **Club_1r_equipo** | First-team club associated with the reserve team. Relational key linking to other tables. |
+| **S1_Stake_1r (0–3)** | Internal scoring of first-team match importance (0 = irrelevant; 3 = key). |
+| **S2_Stake_filial (0–3)** | Internal scoring of reserve-team match importance. |
+| **Alt_flex** | Alternative flexibility measure derived from alignment frequency. |
+| **Mitja_flex** | Mean flexibility over recent observation window. |
+| **Kickoff_1r** | Kick-off time of the first-team match (24 h format). |
+| **Kickoff_filial** | Kick-off time of the reserve match. |
+| **Δt_h** | Hour difference between both kick-offs; key for overlap detection. |
+| **Dir** | Direction of player flow (encoded: `1st→B`, `B→1st`, or `Both`). |
+| **F_idx** | Normalized flexibility index (0–1) — captures magnitude and direction. |
+| **g (ventana)** | Rolling-window parameter defining aggregation depth (matches). |
+| **FIS** | Composite flexibility signal combining multiple indicators (proprietary weighting). |
+| **Semáforo** | Qualitative gating system (“Red”, “Amber”, “Green”) defining model confidence zone. |
+| **Ángulo** | Tag describing actionable angle or market condition (e.g. “Fade”, “Buy”, “Neutral”). |
+| **Notas** | Operator or analyst notes for contextual observations. |
+| **Unnamed: 20–21** | Empty placeholder columns ignored in processing. |
 
 ---
 
-## 🏟️ Club-Level Flexibility Summary
+## 🏟️ Club-Level Flexibility Summary  
 
 | Variable | Description |
 |-----------|-------------|
-| **Club_1r_equipo** | Unique key representing the first-team club. |
-| **FLEX_sum** | Cumulative flexibility load (sum of flexibility instances across the period). |
-| **FLEX_mean** | Mean flexibility score per observation or match. |
-| **n_players** | Total players observed within the sample window. |
-| **n_bridge_players** | Count of players appearing in both first and reserve teams within the same period. |
+| **Club_1r_equipo** | Unique identifier of the first-team club. |
+| **FLEX_sum** | Total cumulative flexibility load for the observation period. |
+| **FLEX_mean** | Average flexibility per match entry. |
+| **n_players** | Total players considered within the dataset window. |
+| **n_bridge_players** | Count of players featuring in both first and reserve squads (bridge players). |
+| **FLEX_ratio** | Proportion of bridge players relative to squad size — proxy of squad elasticity. |
+| **Last_update** | Last data refresh timestamp (used in Power BI). |
 
 ---
 
-## 🔄 Relationships Between Tables
+## 👤 Player Block Structure  
 
-- **1st-team link** → `Club_1r_equipo` serves as relational key across the FIS sheet, player register, and club summary.
-- **Temporal alignment** → `Fecha` and `Δt_h` synchronize events between both squads.
-- **Aggregations** → Club-level summaries are derived from match-level records, feeding into higher-order metrics (PFI, team risk).
+| Variable | Description |
+|-----------|-------------|
+| **Player_ID** | Unique internal identifier. |
+| **Player_name** | Player full name (standardized). |
+| **Club_current** | Current club association at data time. |
+| **Club_origin** | Club of origin (if loaned or transferred). |
+| **Appearances_B** | Number of appearances in the reserve squad. |
+| **Appearances_1st** | Number of appearances in the first team. |
+| **Bridge_flag** | Boolean flag if the player has appeared in both squads. |
+| **Flex_score** | Player-level normalized flexibility score. |
+| **Minutes_total** | Total minutes accumulated (all competitions). |
+| **Last_seen** | Last appearance date. |
+| **Season_period** | Data window (e.g. “2025-Q3”). |
 
 ---
 
-## 🧠 Analytical Use
+## 🔗 Relational Structure  
 
-- **Exploratory** – Identify structural imbalances in squad deployment.  
-- **Modeling** – Input features for PFI computation and FIS calibration.  
-- **Validation** – Compare expected vs. observed flexibility impact across matches.  
+- `Club_1r_equipo` → primary key linking across **FIS**, **Club Summary**, and **Player Blocks**.  
+- `Fecha` + `Equipo_filial` → composite key for temporal alignment.  
+- Aggregations cascade upward: **Player → Match → Club**.  
 
 ---
 
-> All variable names and ranges are kept identical to the working files to preserve schema integrity.  
-> Sensitive scoring methods and weights remain proprietary.
+## 🧠 Analytical Use  
+
+| Layer | Use case |
+|-------|-----------|
+| **Match-level (FIS)** | Detect intra-week flexibility shocks and predict betting market inefficiencies. |
+| **Club-level summary** | Quantify organizational flexibility and risk exposure. |
+| **Player-level block** | Measure rotational dynamics and player volatility across squads. |
+
+---
+
+## 🗒️ Notes  
+
+- All values are **anonymized** or **synthetic replicas** mirroring the real model’s architecture.  
+- Proprietary coefficients and weights are excluded for confidentiality.  
+- The schema aligns fully with the internal FIS pipeline used for predictive modeling, feature engineering, and Power BI visualization.
 
 ---
 
 **Author:** [Sergi Ferrer Juanola](https://github.com/Sergi232)  
+*Sports Data Scientist | Predictive Modeling & Football Analytics*
+232)  
 *Sports Data Scientist | Predictive Modeling & Football Analytics*
